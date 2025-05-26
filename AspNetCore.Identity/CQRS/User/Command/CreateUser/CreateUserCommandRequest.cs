@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace AspNetCore.Identity.CQRS.User.Command;
+namespace AspNetCore.Identity.CQRS.User.Command.CreateUser;
 
 public class CreateUserCommandRequest : IRequest<CreateUserCommandResponse>
 {

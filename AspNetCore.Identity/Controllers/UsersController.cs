@@ -1,4 +1,5 @@
-﻿using AspNetCore.Identity.CQRS.User.Command;
+﻿using AspNetCore.Identity.CQRS.User.Command.CreateUser;
+using AspNetCore.Identity.CQRS.User.Command.LoginUser;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -19,6 +20,13 @@ namespace AspNetCore.Identity.Controllers
         public async Task<IActionResult> CreateUser(CreateUserCommandRequest request)
         {
             CreateUserCommandResponse response = await _mediator.Send(request);
+            return Ok(response);
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> Login(LoginUserCommandRequest request)
+        {
+           LoginUserCommandResponse response = await _mediator.Send(request);
             return Ok(response);
         }
     }

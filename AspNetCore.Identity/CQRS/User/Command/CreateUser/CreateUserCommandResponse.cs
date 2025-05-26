@@ -1,4 +1,4 @@
-﻿namespace AspNetCore.Identity.CQRS.User.Command
+﻿namespace AspNetCore.Identity.CQRS.User.Command.CreateUser
 {
     public class CreateUserCommandResponse
     {

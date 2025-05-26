@@ -3,7 +3,7 @@ using AspNetCore.Identity.Exceptions;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
-namespace AspNetCore.Identity.CQRS.User.Command;
+namespace AspNetCore.Identity.CQRS.User.Command.CreateUser;
 
 public class CreateUserCommandHandler : IRequestHandler<CreateUserCommandRequest, CreateUserCommandResponse>
 {
@@ -22,13 +22,20 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommandRequest
             Email = request.Email,
         }, request.Password);
 
-        if (result.Succeeded)
-            return new()
-            {
-                Successed = true,
-                Message = "Kullanıcı başarıyla oluşturuldu!"
-            };
+        CreateUserCommandResponse response = new()
+        {
+            Successed = result.Succeeded
+        };
 
-        throw new UserCreateFailedException("Kullanıcı oluşturulamadı");
+        if (result.Succeeded)
+            response.Message = "Kullanıcı başarıyla oluşturuldu";
+        else
+        {
+            foreach (var error in result.Errors)
+            {
+                response.Message += $"{error.Code} - {error.Description}<br>";
+            }
+        }
+        return response;
     }
 }
