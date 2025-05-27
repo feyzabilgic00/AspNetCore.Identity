@@ -1,4 +1,6 @@
-﻿using AspNetCore.Identity.Entities;
+﻿using AspNetCore.Identity.Abstractions.Token;
+using AspNetCore.Identity.DTOs;
+using AspNetCore.Identity.Entities;
 using AspNetCore.Identity.Exceptions;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -9,14 +11,18 @@ public class LoginUserCommandHandler : IRequestHandler<LoginUserCommandRequest, 
 {
     readonly UserManager<AppUser> _userManager;
     readonly SignInManager<AppUser> _signInManager;
-    public LoginUserCommandHandler(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
+    readonly ITokenHandler _tokenHandler;
+    public LoginUserCommandHandler(UserManager<AppUser> userManager, 
+        SignInManager<AppUser> signInManager,
+        ITokenHandler tokenHandler)
     {
         _userManager = userManager;
         _signInManager = signInManager;
+        _tokenHandler = tokenHandler;
     }
     public async Task<LoginUserCommandResponse> Handle(LoginUserCommandRequest request, CancellationToken cancellationToken)
     {
-       AppUser user = await _userManager.FindByNameAsync(request.UsernameOrEmail);
+       AppUser? user = await _userManager.FindByNameAsync(request.UsernameOrEmail);
 
         if (user == null)
             user = await _userManager.FindByEmailAsync(request.UsernameOrEmail);
@@ -28,9 +34,16 @@ public class LoginUserCommandHandler : IRequestHandler<LoginUserCommandRequest, 
 
         if (result.Succeeded)
         {
-            // Yetki işlemleri 
+            TokenDto token = _tokenHandler.CreateAccessToken(5);
+            return new()
+            {
+                Token = token
+            };
         }
 
-        return new();
+        return new()
+        {
+            Message = "Kullanıcı adı veya şifre yanlış"
+        };
     }
 }
